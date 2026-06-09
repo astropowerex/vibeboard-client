@@ -22,7 +22,7 @@ async function start() {
     });
 
     // 3. Инициализация WebSocket
-    const serverUrl = window.BACKEND_URL || "ws://vibeboard-server.onrender.com";
+    const serverUrl = window.BACKEND_URL || "wss://vibeboard-server.onrender.com";
     const socket = new SocketClient({
         serverUrl,
         roomId: discordData.channelId,
