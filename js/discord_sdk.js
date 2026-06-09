@@ -8,7 +8,7 @@ let discordSdk = null;
 let auth = null;
 
 export async function initDiscord() {
-  const clientId = window.DISCORD_CLIENT_ID || 1513885618575511601;
+  const clientId = window.DISCORD_CLIENT_ID || "1513885618575511601";
 
   // Not in Discord iframe → standalone mode
   if (!clientId || !isInDiscordFrame()) {
