@@ -4,94 +4,56 @@
  * Falls back gracefully to a standalone mode when opened in a regular browser.
  */
 
-let discordSdk = null;
-let auth = null;
-
 export async function initDiscord() {
-  const clientId = window.DISCORD_CLIENT_ID || "1513885618575511601";
+  const clientId = "1513885618575511601"; // Твой ID
 
-  // Not in Discord iframe → standalone mode
-  if (!clientId || !isInDiscordFrame()) {
-    console.log("[Discord] Running in standalone mode");
+  // Функция проверки: в Дискорде мы или нет
+  const isInDiscord = window.location.search.includes("frame_id") || navigator.userAgent.includes("Discord");
+
+  if (!isInDiscord) {
+    console.log("[VibeBoard] Standalone Mode");
     return {
       channelId: getOrCreateRoomId(),
       userId: getOrCreateUserId(),
-      username: "Guest",
+      username: "Guest_" + Math.floor(Math.random() * 1000),
       standalone: true,
     };
   }
 
   try {
-    const { DiscordSDK } = await import(
-      "https://esm.sh/@discord/embedded-app-sdk"
-    );
-    discordSdk = new DiscordSDK(clientId);
-
+    // Если мы здесь — мы в Дискорде. Пытаемся подключить SDK.
+    const { DiscordSDK } = await import("https://esm.sh/@discord/embedded-app-sdk");
+    const discordSdk = new DiscordSDK(clientId);
     await discordSdk.ready();
 
-    const { code } = await discordSdk.commands.authorize({
-      client_id: clientId,
-      response_type: "code",
-      state: "",
-      prompt: "none",
-      scope: ["identify", "guilds"],
-    });
-
-    // Exchange code for access token via your backend (or use implicit grant)
-    const tokenResp = await fetch("/api/token", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ code }),
-    });
-    const { access_token } = await tokenResp.json();
-
-    auth = await discordSdk.commands.authenticate({ access_token });
-
-    const channelId = discordSdk.channelId ?? getOrCreateRoomId();
-    const userId = auth?.user?.id ?? getOrCreateUserId();
-    const username = auth?.user?.username ?? "User";
-
-    console.log(`[Discord] Auth OK. Channel: ${channelId}, User: ${username}`);
-
-    return { channelId, userId, username, standalone: false };
+    // Просто используем ID канала как ID комнаты без сложной авторизации для начала
+    return {
+      channelId: discordSdk.channelId || getOrCreateRoomId(),
+      userId: getOrCreateUserId(),
+      username: "User",
+      standalone: false
+    };
   } catch (err) {
-    console.warn("[Discord] SDK init failed, falling back:", err);
+    console.warn("[VibeBoard] SDK failed, fallback to standalone", err);
     return {
       channelId: getOrCreateRoomId(),
       userId: getOrCreateUserId(),
       username: "Guest",
-      standalone: true,
+      standalone: true
     };
-  }
-}
-
-function isInDiscordFrame() {
-  try {
-    return (
-      window.parent !== window ||
-      window.location.search.includes("frame_id") ||
-      navigator.userAgent.includes("Discord")
-    );
-  } catch {
-    return false;
   }
 }
 
 function getOrCreateRoomId() {
   const params = new URLSearchParams(window.location.search);
   if (params.has("room")) return params.get("room");
-  const stored = sessionStorage.getItem("wb_room");
-  if (stored) return stored;
-  const id = "room_" + Math.random().toString(36).slice(2, 10);
+  let id = sessionStorage.getItem("wb_room") || "room_" + Math.random().toString(36).slice(2, 8);
   sessionStorage.setItem("wb_room", id);
   return id;
 }
 
 function getOrCreateUserId() {
-  let id = localStorage.getItem("wb_uid");
-  if (!id) {
-    id = "u_" + Math.random().toString(36).slice(2, 10);
-    localStorage.setItem("wb_uid", id);
-  }
+  let id = localStorage.getItem("wb_uid") || "u_" + Math.random().toString(36).slice(2, 8);
+  localStorage.setItem("wb_uid", id);
   return id;
 }
