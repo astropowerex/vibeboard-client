@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vibe Board</title>
+    <link rel="stylesheet" href="css/style.css">
+    <!-- Иконки -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <div id="app">
+        <!-- Верхняя панель -->
+        <header class="top-bar">
+            <div class="logo">VIBE<span>BOARD</span></div>
+            <div class="room-info">
+                <span id="room-id">Room: ...</span>
+                <span id="user-count"><i class="fas fa-users"></i> 1</span>
+            </div>
+            <div class="actions">
+                <button id="btn-undo" title="Undo (Ctrl+Z)"><i class="fas fa-undo"></i></button>
+                <button id="btn-clear" title="Clear All"><i class="fas fa-trash-alt"></i></button>
+                <button id="btn-export" title="Download PNG"><i class="fas fa-download"></i></button>
+            </div>
+        </header>
+
+        <!-- Основная рабочая область -->
+        <main class="canvas-container">
+            <canvas id="whiteboard"></canvas>
+        </main>
+
+        <!-- Левая панель инструментов -->
+        <aside class="toolbar">
+            <div class="tool-group">
+                <button class="tool-btn active" data-tool="pencil"><i class="fas fa-pencil-alt"></i></button>
+                <button class="tool-btn" data-tool="eraser"><i class="fas fa-eraser"></i></button>
+                <button class="tool-btn" data-tool="fill"><i class="fas fa-fill-drip"></i></button>
+                <button class="tool-btn" data-tool="text"><i class="fas fa-font"></i></button>
+            </div>
+            <div class="tool-group">
+                <button class="tool-btn" data-tool="line"><i class="fas fa-slash"></i></button>
+                <button class="tool-btn" data-tool="rect"><i class="far fa-square"></i></button>
+                <button class="tool-btn" data-tool="circle"><i class="far fa-circle"></i></button>
+                <button class="tool-btn" data-tool="arrow"><i class="fas fa-long-arrow-alt-right"></i></button>
+            </div>
+
+            <div class="settings">
+                <div class="setting-item">
+                    <label>Color</label>
+                    <input type="color" id="color-picker" value="#ffffff">
+                </div>
+                <div class="setting-item">
+                    <label>Size</label>
+                    <input type="range" id="size-slider" min="1" max="50" value="4">
+                </div>
+                <div class="setting-item">
+                    <label>Opacity</label>
+                    <input type="range" id="opacity-slider" min="0.1" max="1" step="0.1" value="1">
+                </div>
+            </div>
+        </aside>
+
+        <!-- Оверлей загрузки -->
+        <div id="loading-overlay">
+            <div class="spinner"></div>
+            <p>Connecting to Vibe Board...</p>
+        </div>
+    </div>
+
+    <!-- Конфигурация (замени на свой ID из Discord Developer Portal) -->
+    <script>
+        window.DISCORD_CLIENT_ID = "ТВОЙ_CLIENT_ID_ЗДЕСЬ"; 
+        window.BACKEND_URL = "https://vibe-board-server.onrender.com"; // URL после деплоя на Render
+    </script>
+    <script type="module" src="js/app.js"></script>
+</body>
+</html>
